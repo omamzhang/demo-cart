@@ -1,1 +1,346 @@
-function isType(t){return function(o){return Object.prototype.toString.call(o)==="[object "+t+"]"}}var vm=new Vue({el:"#app",data:{infoQ:{name:"商品名",code:"test02",brand:"品牌",tag:"现货",imgs:["http://","http://","http://"],brand:"SYL",price:"0.01",colors:["红","黄","蓝","绿"],sizes:["S","M","L"],sku:{"红":{sizes:[10,12,1],total:0},"黄":{sizes:[10,12,1],total:0},"蓝":{sizes:[10,12,1],total:0},"绿":{sizes:[10,12,1],total:0}}},info:{},cart:{},counting:{key:"",color:"",sku:0,size:"",count:0,sizes:"",diff:0},total:{count:0,price:0}},watch:{"counting.count":function(t,o){var n=this.counting,e=this.info.sku;e[n.color].total=n.total}},computed:{_price:function(){return this.info.price},_size:function(){return this.info.sizes},isActive:function(){return!!this.total.count},checkedKey:function(){return this.counting.color+"_"+this.counting.size},colorsPack:function(){return(this.info.colors||[]).join(",")},sizesPack:function(){return(this.info.sizes||[]).join(",")},imgSlide:function(){var t=this.info.imgs||[];return{total:t.length,current:0,src:t}}},methods:{showCover:function(){var t=document.documentElement.querySelector(".cover");t.style.display="block"},hideCover:function(){var t=document.documentElement.querySelector(".cover");t.style.display="none"},toggleCheck:function(t){var o=t.target.dataset,n=this.counting;for(var e in n)n[e]=o[e];var i=this.cart,r=o.color,c=o.size;i[r]?(i[r][c]||(i[r][c]=0),void 0===typeof i[r].total&&(i[r].total=0)):(i[r]={},i[r][c]=0,i[r].total=0),n.count=i[r][c],n.total=i[r].total,n.key=r+"_"+c},inputCounter:function(t){var o=this.counting,n=0;""===o.key&&alert("请选择商品"),n=t.target.value,/^\s*$/.test(n)?n="":/^[1-9]\d*|0$/g.test(n)?(n=+n,sku=+o.sku,n>sku&&(n=sku)):n=0,t.target.value=n,o.count!=n&&this.cartUpdate(n)},counter:function(t){var o=this.counting;if(""===o.key)return alert("请选择商品");var n=o.sku,e=+t.target.dataset.flag,i=e,r=+o.count+e;if(r<0?(r=0,i=0):r>n&&(r=n,i=0),i){return void this.cartUpdate(r);var r}},createOrder:function(){this.total.count?this.hideCover():alert("您还未选择商品")},getProductDetail:function(){var t=this;axios.get("/h5/data/product.json",{params:{id:"test02"}}).then(function(o){var n=o.data;n.hasError?alert(n.message):t.info=n.data})["catch"](function(t){})},cartUpdate:function(t){var o=this.counting;o.count=t;var n=this.cart,e=n[o.color];e[o.size]=o.count;for(var i=this.info.sizes,r=0,c=0,a=i.length;c<a;c++){var s=e[i[c]];r+=s||0}e.total=r,o.total=r,console.clear(),console.log("--- total --");var t=0;for(var u in n)t+=+n[u].total,console.log(u,n[u]);this.total.count=t,this.total.price=(t*this._price).toFixed(2)}},mounted:function(){this.getProductDetail()}});
+function isType(type){
+	return function(obj){
+		return Object.prototype.toString.call(obj) === '[object '+ type+']';
+	}
+}
+
+ 
+var vm = new Vue({
+    el: "#app",
+    data: {
+        infoQ: {
+            "name": "商品名",
+            "code": "test02",
+            "brand": "品牌",
+            "tag": "现货",
+            "imgs": [
+                "http://",
+                "http://",
+                "http://"
+            ],
+            "brand": "SYL",
+            "price": "0.01",
+            "colors": ["红", "黄", "蓝", "绿"],
+            "sizes": ["S", "M", "L"],
+            "sku": {
+                "红": { "sizes": [10, 12, 1], "total": 0 },
+                "黄": { "sizes": [10, 12, 1], "total": 0 },
+                "蓝": { "sizes": [10, 12, 1], "total": 0 },
+                "绿": { "sizes": [10, 12, 1], "total": 0 }
+            }
+        },
+        info: {},
+        cart: {}, // "红": { S: 9, M:2, L:4 , total:0 } 
+        counting: {
+            key: "",
+            color: "",
+            sku: 0,
+            size: "",
+            count: 0,
+            sizes: "",
+            diff: 0 //计数差值
+        },
+        total: {
+        	count: 0,
+        	price: 0
+        }
+    },
+    watch: {
+        'counting.count': function(val, old){
+            var counting = this.counting;
+            var sku = this.info.sku;
+
+            sku[counting.color].total = counting.total;
+            // console.log(sku);
+        }
+    },
+    computed: {
+        _price: function() { return this.info.price; },
+        _size: function() { return this.info.sizes; },
+        isActive: function() {
+        	return !!this.total.count;
+        }, 
+        checkedKey: function(){
+        	return this.counting.color+"_"+this.counting.size;
+        }, 
+        colorsPack: function() {
+            return (this.info.colors || []).join(",");
+        },
+        sizesPack: function() {
+            return (this.info.sizes || []).join(",");
+        },
+        imgSlide: function() {
+            var imgs = this.info.imgs || [];
+
+            return {
+                total: imgs.length,
+                current: 0,
+                src: imgs
+            };
+        }
+
+    },  
+    methods: {
+    	showCover: function(){
+    		var $cover = document.documentElement.querySelector('.cover');
+    		$cover.style.display = "block";
+    	},
+    	hideCover: function(){
+    		var $cover = document.documentElement.querySelector('.cover');
+    		$cover.style.display = "none"; 
+    	},
+        toggleCheck: function($event) {
+            var dataset = $event.target.dataset;
+            
+            var counting = this.counting;
+            for (var key in counting) {
+                counting[key] = dataset[key];
+            }
+
+            //- 数据反显购物车中已选数据
+            var cart = this.cart;
+            var color = dataset.color;
+            var size = dataset.size;
+
+            if (!cart[color]) {
+                cart[color] = {};
+                cart[color][size] = 0;
+                cart[color].total = 0;
+            } else {
+                if (!cart[color][size]) {
+                    cart[color][size] = 0;
+                }
+                if (typeof cart[color].total === undefined) {
+                    cart[color].total = 0;
+                }
+
+
+            } 
+            counting.count = cart[color][size];
+            counting.total = cart[color].total;
+            counting.key = color + "_"+ size;
+        },
+        inputCounter: function($event){
+        	var counting = this.counting;
+ 			
+ 			var count = 0;
+    		if(counting.key === ""){  
+                alert("请选择商品");
+            }  
+
+        	count = $event.target.value;
+        	if(/^\s*$/.test(count)){
+        		count = '';
+        	}else if( (/^[1-9]\d*|0$/g).test(count)){
+        		count = (+count);
+        		sku = +counting.sku;
+        		if(count > sku){
+	    			count = sku;
+	    		} 
+        	}else{
+        		count = 0;
+        	}
+    		  
+    		$event.target.value = count;
+
+
+    		if(counting.count != count){
+                this.cartUpdate(count);
+            	/*counting.count = count;
+
+            	//小计
+	            var cart = this.cart;
+	            var updateItem = cart[counting.color];
+	            updateItem[counting.size]  = counting.count;
+
+	            var sizes = this.info.sizes;
+            	var total = 0; 
+            	for(var i=0, len= sizes.length; i< len; i++){ 
+            		var iCount = updateItem[sizes[i]];
+            		total += (iCount || 0);
+            	}
+            	updateItem.total = total;
+            	counting.total = total;
+
+	  			//总计
+	  			//console.log("--- total --");
+	  			var count = 0;
+	            for(var item in cart){
+	            	count += (+cart[item].total);
+	            	//console.log(cart[item]);
+	            }
+
+	            this.total.count  = count;
+	            this.total.price = (count * this._price).toFixed(2);*/
+	        } 
+        },
+        counter: function($event) {
+            var counting = this.counting;
+
+            if(counting.key === ""){
+            	return alert("请选择商品");
+            }
+
+            var max = counting.sku;
+            
+            var flag = (+$event.target.dataset.flag);
+            var diff = flag;
+            
+            var count = (+counting.count) + flag; 
+ 
+
+            if (count < 0) { 
+                count = 0;
+                diff = 0; 
+            } else if (count > max) {
+                count = max;
+                diff = 0;
+            } 
+  
+            //数据有变化 更新当前数据
+            if(diff){
+                this.cartUpdate(count);
+                return;
+            	counting.count = count;
+            	counting.total += diff;
+
+            	//小计
+	            var cart = this.cart;
+	            var updateItem = cart[counting.color];
+	            updateItem[counting.size]  = counting.count;
+	            updateItem.total = counting.total;
+
+	  			//总计
+	  			console.log("--- total --");
+	  			var count = 0;
+	            for(var item in cart){
+	            	count += (+cart[item].total);
+
+	            	console.log(cart[item]);
+	            }
+
+	            this.total.count  = count;
+	            this.total.price = (count * this._price).toFixed(2);
+	        }
+        },
+        createOrder: function(){
+        	if(this.total.count){
+        	 	this.hideCover();
+        	}else{
+        		alert("您还未选择商品");
+        	}
+        },
+        getProductDetail: function(){
+        	var vm = this;
+        	axios.get('../data/product.json',{
+        		params:{ id: "test02"}
+        	}).then(function(response){
+        		var res = response.data;
+        		if(!res.hasError){
+        			vm.info = res.data;
+        			// console.log(vm.info );
+        		}else{
+        			alert(res.message);
+        		}
+        	}).catch(function(error){
+        		// error massage tips
+        	});
+        },
+        //-- 暂时无用
+        cartUpdate: function(count) {
+            var counting = this.counting;
+            counting.count = count;
+
+            //小计
+            var cart = this.cart;
+            var updateItem = cart[counting.color];
+            updateItem[counting.size]  = counting.count;
+
+            var sizes = this.info.sizes;
+            var total = 0; 
+            for(var i=0, len= sizes.length; i< len; i++){ 
+                var iCount = updateItem[sizes[i]];
+                total += (iCount || 0);
+            }
+            updateItem.total = total;
+            counting.total = total;
+
+            //总计
+            console.clear();
+            console.log("--- total --");
+            var count = 0;
+            for(var item in cart){
+                count += (+cart[item].total);
+                console.log(item, cart[item]);
+            }
+
+            this.total.count  = count;
+            this.total.price = (count * this._price).toFixed(2);
+        }
+    },
+    mounted: function() {
+    	this.getProductDetail();
+    }
+});
+ 
+/*
+var product = (function(){
+
+	function getProductDetail(){
+		//- ajax get productdetail information
+		$.ajax({
+			url: "http//hostname/path/to/product_detail.json",
+			cached: false,
+			success: function(res){
+				if(!res.hasError && !res.data){
+					//call successFunction()  -> show productInfo
+				} 
+				return res.massage; 
+			},
+			error: function(){
+				// warn message
+			},
+			complete: function(){
+				// other handle
+			}
+		});
+
+	var dataProduct = {
+		"hasError": false,
+		"message": "请求成功",
+		"data": {
+			"name": "商品名",
+			"code": "test02",
+			"brand": "品牌",
+			"imgShow": [
+				"http://",
+				"http://",
+				"http://"
+			],
+			"brand": "品牌",
+			"price": "0.01",
+			"colors": ["红", "黄", "蓝", "绿"],
+			"size": ["S", "M", "L"],
+			"sku": {
+				"红": [10, 12, 1],
+				"黄": [10, 12, 1],
+				"蓝": [10, 12, 1],
+				"绿": [10, 12, 1]
+			}
+		}
+
+	};
+
+	//- show productInfo
+	function randerPage(data){
+		
+	}
+
+
+	return {
+		init: function(){
+
+		}
+	};
+
+})();*/
