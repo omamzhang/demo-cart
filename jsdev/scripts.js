@@ -232,7 +232,7 @@ var vm = new Vue({
         },
         getProductDetail: function(){
         	var vm = this;
-        	axios.get('../data/product.json',{
+        	axios.get('demo-cart/data/product.json',{
         		params:{ id: "test02"}
         	}).then(function(response){
         		var res = response.data;
