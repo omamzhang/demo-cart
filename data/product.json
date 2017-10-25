@@ -1,0 +1,26 @@
+{
+    "hasError": false,
+    "message": "请求成功",
+    "data":{
+        "name": "商品名",
+        "code": "test02",
+        "brand": "品牌",
+        "tag": "现货",
+        "imgs": [
+            "http://",
+            "http://",
+            "http://"
+        ],
+        "brand": "SYL",
+        "price": "0.01",
+        "colors": ["红", "黄", "蓝", "绿"],
+        "sizes": ["S", "M", "L"],
+        "sku": {
+            "红": { "sizes": [10, 12, 1], "total": 0 },
+            "黄": { "sizes": [10, 12, 1], "total": 0 },
+            "蓝": { "sizes": [10, 12, 1], "total": 0 },
+            "绿": { "sizes": [10, 12, 1], "total": 0 }
+        }
+    }
+    
+}

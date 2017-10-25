@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>购物流程 - 750px</title>
+    <script src="/h5/jsdev/rem.js"></script>
+    <link rel="stylesheet" href="/h5/css/style.css" type="text/css">
+</head>
+
+<body>
+    <div class="wrapper page-product" id="app" v-cloak>
+        <div class="boder">
+            <section class="product-base">
+                <div class="show">
+                    <div class="tag">{{ info.tag }}</div>
+                    <div class="count">{{ imgSlide.current }}/{{ imgSlide.total }} </div>
+                </div>
+                <div class="base">
+                    <h3 class="mode-item title">{{ info.name }}</h3>
+                    <div class="mode-item count">{{ info.price }}</div>
+                    <div class="mode-item other">
+                        <span>货号：{{ info.code }}</span>
+                        <span>品牌：{{ info.brand }}</span>
+                    </div>
+                </div>
+            </section>
+            <section class="product-info ">
+                <h3 class="desc-title">商品信息</h3>
+                <div class="desc-list">
+                    <dl class="item">
+                        <dt>颜色</dt>
+                        <dd>{{ colorsPack }}</dd>
+                    </dl>
+                    <dl class="item">
+                        <dt>尺码</dt>
+                        <dd>{{ sizesPack }}</dd>
+                    </dl>
+                </div>
+            </section>
+        </div>
+        <div class="footer">
+        	<div class="container">
+            	<div class="btn-buy" @click='showCover($event)'>立即购买</div>
+        	</div>
+        </div>
+        <div class="cover">
+            <div class="cover-bg" @click.stop='hideCover($event)'></div>
+            <div class="bodyer">
+            	<div class="container">
+	                <div class="tips"> 立即下单 <span class="f-right">单价：<span class="b">{{ info.price }}</span>元/件</span>
+	                </div>
+	                <div class="product-sku">
+	                    <dl class="size">
+	                        <dt>尺寸</dt>
+	                        <dd v-for="item in info.sizes">
+	                            {{item}}
+	                        </dd>
+	                        <dd class="total">小计</dd>
+	                    </dl>
+	                    <div class="colors">
+	                        <dl class="color" v-for="(item, key) in info.sku">
+	                            <dt>{{ key }}</dt>
+	                            <dd @click="toggleCheck($event)" v-for="(count,index) in item.sizes" :data-color="key" :data-size="info.sizes[index]" :data-key="key+'_'+info.sizes[index]" :data-sku="count" :class="{'sel': checkedKey === key+'_'+info.sizes[index]}">
+	                                {{ count }}
+	                            </dd>
+	                            <dd class="total" :data-total="key">{{ key === counting.color ? (counting.total) : item.total }}</dd>
+	                        </dl>
+	                    </div>
+	                    <div v-for="(item,key) in cart">
+	                        {{key}}
+	                        <template v-for="(subitem, subkey) in item">
+	                            <span v-if="subkey != 'total'">
+	    	    						{{subkey}} - {{subitem}} 
+	    	    					</span>
+	                        </template>
+	                    </div>
+	                </div>
+	                <div class="counter">
+	                    <div class="btn-count minus" data-flag="-1" @click="counter($event)">&minus;</div>
+	                    <input class="txt-count" type="number" min="0" placeholder="0" @input="inputCounter($event)" :value="counting.count">
+	                    <div class="btn-count plus" @click="counter($event)" data-flag="1">&plus;</div>
+	                </div>
+	                <div class="total-box">
+	                    <div class="total">合计：<span id="total-count" class="b">{{ total.count }}</span>件</div>
+	                    <div class="price">
+	                        总价：￥<span class="b" id="total-price">{{total.price}}</span>
+	                    </div>
+	                    <div :class="['btn-submit', {active: isActive}]" @click.stop='createOrder($event)'>立即下单</div>
+	                </div>
+            	</div>
+            </div>
+        </div>
+    </div>
+    <script src="/h5/jsdev/vue-2.5.2.min.js"></script>
+    <script src="/h5/jsdev/axios.js"></script>
+    <script src="/h5/js/scripts.js"></script>
+    
+    <script src="http://127.0.0.1:35729/livereload.js"></script>
+</body>
+
+</html>
