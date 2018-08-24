@@ -31,7 +31,7 @@
         "dev": "npx webpack-serve",
         "start": "npx webpack --config webpack.config.js",
         "build:css": "lessc src/common/style/nav.less  dist/common/style/nav.css",
-        "build:dev": "npm run dev && npm run build:css",
+        "build:dev": "npm run dev",
         "build:pro": "npm run start",
         "build:test": "npm run start && http-server",
         "test": "echo \"Error: no test specified\" && exit 1"
